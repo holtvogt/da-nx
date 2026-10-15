@@ -137,4 +137,18 @@ describe('nx-form', () => {
     const { tags } = el._editor.getState().document.data;
     expect(tags === undefined || tags.length === 0).to.equal(true);
   });
+
+  describe('forceSave()', () => {
+    it('resolves ok when no document is loaded', async () => {
+      const form = makeForm();
+      expect(await form.forceSave()).to.deep.equal({ ok: true });
+    });
+
+    it('resolves with the result of the persistence flush', async () => {
+      const form = makeForm();
+      const failure = { ok: false, error: 'Forbidden', status: 403 };
+      form._persistence = { flush: async () => failure, detach() {} };
+      expect(await form.forceSave()).to.deep.equal(failure);
+    });
+  });
 });

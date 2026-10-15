@@ -147,7 +147,15 @@ this._persistence = attachPersistence(this._editor, { path: this._details?.fullp
 this._persistence?.detach();
 ```
 
-`persistence.js` is ~50 lines, self-contained: it imports `convertJsonToHtml` from the SDK and accepts a `save` function (default `saveSourceHtml` from `./da-api.js`). The form block's call site is one line — no callback factory needed. If a save-indicator UI is ever added, the persistence would gain a status callback at that time.
+`persistence.js` is self-contained. It imports `convertJsonToHtml` from the SDK and accepts a `save` function (default `saveSourceHtml` from `./da-api.js`). The form block's call site is one line and needs no callback factory. If a save-indicator UI is ever added, the persistence would gain a status callback at that time.
+
+### Save results
+
+A save only counts when `save()` resolves `{ ok: true }`. HTTP failures, a signed-out `{}`, serialization errors and thrown errors are failures. There is no automatic retry and no UI.
+
+- Every edit bumps a revision. A successful save marks the revision it sent as saved, not the latest one. A failed save marks nothing, and the next successful save covers it because every save sends the full document.
+- `flush()` waits until autosave is idle. It resolves `{ ok: true }` if the document as of the call is saved, or the failure otherwise. With no save running it re-sends unsaved edits, except after `detach()`.
+- `nx-form.forceSave()` returns `flush()`, or `{ ok: true }` when no document is loaded. It mirrors the canvas `ew-editor-doc.forceSave()`, so a caller such as an asset picker can confirm a change reached the source.
 
 For test details on the single-flight + re-queue contract, see [test/nx/blocks/form/utils/persistence.test.js](../../../../test/nx/blocks/form/utils/persistence.test.js).
 

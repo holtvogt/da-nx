@@ -110,6 +110,11 @@ class Form extends LitElement {
     }
   }
 
+  // Mirrors the canvas `ew-editor-doc.forceSave()`.
+  forceSave() {
+    return this._persistence?.flush() ?? Promise.resolve({ ok: true });
+  }
+
   _start({ schema, json }) {
     this._editor = createEngine({ schema, document: json, onChange: this._onChange });
     // Seed empty rows for required arrays (UI convenience). Runs before

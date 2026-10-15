@@ -250,7 +250,7 @@ describe('SDK converters', () => {
   });
 
   it('convertJsonToHtml returns { error } on input without schemaName', () => {
-    // persistence.js relies on this branch: `if (error) return;`
+    // persistence.js relies on this branch to report a serialization failure.
     const result = convertJsonToHtml({ json: { metadata: {}, data: {} } });
     expect(result.html).to.equal(undefined);
     expect(result.error).to.be.a('string');
@@ -267,7 +267,10 @@ describe('SDK × attachPersistence (end-to-end)', () => {
   it('saves after a real mutation through createEngine', async () => {
     let p;
     const calls = [];
-    const save = async ({ path, html }) => { calls.push({ path, html }); };
+    const save = async ({ path, html }) => {
+      calls.push({ path, html });
+      return { ok: true };
+    };
 
     const editor = createEngine({
       schema: demoSchema,
@@ -282,13 +285,17 @@ describe('SDK × attachPersistence (end-to-end)', () => {
     expect(calls).to.have.lengthOf(1);
     expect(calls[0].path).to.equal('/smoke');
     expect(calls[0].html).to.include('Alice');
+    expect(await p.flush()).to.deep.equal({ ok: true });
     p.detach();
   });
 
   it('does not save when no real mutation occurs', async () => {
     let p;
     const calls = [];
-    const save = async ({ path, html }) => { calls.push({ path, html }); };
+    const save = async ({ path, html }) => {
+      calls.push({ path, html });
+      return { ok: true };
+    };
 
     const editor = createEngine({
       schema: demoSchema,
