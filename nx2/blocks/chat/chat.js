@@ -41,6 +41,7 @@ class NxChat extends LitElement {
     toolCards: { type: Object },
     // { type: 'approval', ... } | null — see chat-backend.js#_normalize.
     pendingInteraction: { type: Object },
+    embedded: { type: Boolean, reflect: true },
     _prompts: { state: true },
     _hasItems: { state: true },
     _dragging: { state: true },
@@ -334,12 +335,12 @@ class NxChat extends LitElement {
           ?hidden=${!this.messages?.length}
           @click=${() => this.clear()}
         >${icon('clear')}<span>Clear</span></button>
-        <button
+        ${this.embedded ? nothing : html`<button
           type="button"
           class="chat-header-btn"
           aria-label="Close chat panel"
           @click=${this._closePanel}
-        >${icon('close')}</button>
+        >${icon('close')}</button>`}
       </div>
       <div class="chat-scroll-container">
         <div class="chat-messages-container" role="log" aria-live="polite">

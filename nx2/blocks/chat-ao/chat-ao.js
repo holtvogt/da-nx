@@ -67,6 +67,7 @@ export default class NxChatAo extends LitElement {
     pendingPermission: { type: Object },
     loadingEpisode: { type: Boolean },
     staleEpisode: { type: Object },
+    embedded: { type: Boolean, reflect: true },
     _dragging: { state: true },
     _prompts: { state: true },
     _planFeedback: { state: true },
@@ -426,7 +427,7 @@ export default class NxChatAo extends LitElement {
           .onSend=${(p) => this._sendPrompt(p)}
         ></nx-prompts>
       </nx-popover>
-      <div class="chat-header">
+      ${this.embedded && !this.episodes?.length ? nothing : html`<div class="chat-header">
         ${this.episodes?.length ? html`
           <nx-picker
             class="session-picker"
@@ -437,7 +438,7 @@ export default class NxChatAo extends LitElement {
             placement="below"
             @change=${this._handleEpisodeChange}
           ></nx-picker>` : nothing}
-        <div>
+        ${this.embedded ? nothing : html`<div>
           <button type="button" class="nx-action-btn-quiet nx-new-chat nx-btn-sm" @click=${this._handleNewSession}>
             ${icon('newChat')}
             <span>New chat</span>
@@ -447,8 +448,8 @@ export default class NxChatAo extends LitElement {
             aria-label="Close chat panel"
             @click=${this._closePanel}
           >${icon('close')}</button>
-        </div>
-      </div>
+        </div>`}
+      </div>`}
       <div class="chat-scroll-container">
         <div class="chat-messages-container" role="log" aria-live="polite">
           ${this.loadingEpisode ? html`

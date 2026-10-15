@@ -1,0 +1,26 @@
+/* Light DOM: the schema editor fills main like other app-frame workspaces. */
+.nx-schema-editor {
+  display: block;
+}
+
+.nx-schema-editor,
+nx-schema-editor {
+  box-sizing: border-box;
+  height: calc(100vh - var(--s2-nav-height));
+}
+
+@media (width >= 600px) {
+  main:has(.nx-schema-editor) > .section {
+    min-height: 0;
+  }
+
+  .block-content:has(> .nx-schema-editor),
+  .nx-schema-editor,
+  nx-schema-editor {
+    height: 100%;
+  }
+}
+
+aside.panel[data-section='chat'] nx-schema-side-panel {
+  height: 100%;
+}
